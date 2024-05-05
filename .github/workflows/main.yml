@@ -231,13 +231,13 @@ jobs:
           cd build/ios/iphoneos
           mkdir Payload
           mv ./Runner.app ./Payload
-          zip -r -m ./ios_nosigned.ipa ./Payload
+          zip -r -m ./ios-nosigned.ipa ./Payload
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
           files: |
-            build/ios/iphoneos/ios_nosigned.ipa
+            build/ios/iphoneos/ios-nosigned.ipa
           token: ${{ secrets.PUBLISH_GITHUB_TOKEN }}
 
   build-and-release-macos-arm64:
