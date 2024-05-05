@@ -22,7 +22,7 @@ jobs:
         uses: actions-rust-lang/setup-rust-toolchain@v1
         with:
           cache: true
-          cache-workspace: |-
+          cache-workspaces: |-
             ./rust
 
       - name: Set up Flutter
@@ -84,7 +84,7 @@ jobs:
         uses: actions-rust-lang/setup-rust-toolchain@v1
         with:
           cache: true
-          cache-workspace: |-
+          cache-workspaces: |-
             ./rust
 
       - name: Set up Flutter
@@ -143,7 +143,7 @@ jobs:
         uses: actions-rust-lang/setup-rust-toolchain@v1
         with:
           cache: true
-          cache-workspace: |-
+          cache-workspaces: |-
             ./rust
 
       - name: Set up Flutter
@@ -197,7 +197,7 @@ jobs:
         uses: actions-rust-lang/setup-rust-toolchain@v1
         with:
           cache: true
-          cache-workspace: |-
+          cache-workspaces: |-
             ./rust
 
       - name: Set up Flutter
@@ -252,7 +252,7 @@ jobs:
         uses: actions-rust-lang/setup-rust-toolchain@v1
         with:
           cache: true
-          cache-workspace: |-
+          cache-workspaces: |-
             ./rust
 
       - name: Set up Flutter
