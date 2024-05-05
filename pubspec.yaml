@@ -1,0 +1,43 @@
+name: yande_gui
+description: "Cross-platform GUI for yande"
+publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+
+version: 0.0.2+2
+
+environment:
+  sdk: '>=3.3.4 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+
+  cupertino_icons: ^1.0.6
+  core:
+    path: rust_builder
+  flutter_rust_bridge: 2.0.0-dev.32
+
+  flutter_riverpod: ^2.5.1
+  riverpod_annotation: ^2.3.5
+  path_provider: ^2.1.2
+  visibility_detector: ^0.4.0+2
+  path: ^1.9.0
+  loading_more_list: ^6.0.0
+  extended_image: ^8.2.0
+  flutter_easyloading: ^3.0.5
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+  flutter_lints: ^3.0.0
+  integration_test:
+    sdk: flutter
+
+  build_runner:
+  custom_lint:
+  riverpod_generator: ^2.4.0
+  riverpod_lint: ^2.3.10
+flutter:
+  uses-material-design: true
