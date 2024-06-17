@@ -22,11 +22,14 @@ class AutoScaffold extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isVertical = MediaQuery.of(context).size.width < MediaQuery.of(context).size.height;
+    final isVertical =
+        MediaQuery.of(context).size.width < MediaQuery.of(context).size.height;
 
-    final Widget child = builder?.call(context, !isVertical) ?? const SizedBox();
+    final Widget child =
+        builder?.call(context, !isVertical) ?? const SizedBox();
 
-    final Widget? title = titleWidget ?? (isVertical ? verticalOnlyTitleWidget : horizontalOnlyTitleWidget);
+    final Widget? title = titleWidget ??
+        (isVertical ? verticalOnlyTitleWidget : horizontalOnlyTitleWidget);
 
     return Scaffold(
       appBar: title != null ? AppBar(title: title) : null,

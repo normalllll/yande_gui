@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:yande_gui/pages/downloader/downloader_page.dart';
 import 'package:yande_gui/pages/post_list/post_list_page.dart';
+import 'package:yande_gui/pages/settings/settings_page.dart';
 import 'package:yande_gui/widgets/lazy_indexed_stack/lazy_indexed_stack.dart';
 
 class IndexPage extends StatefulWidget {
@@ -13,8 +14,9 @@ class IndexPage extends StatefulWidget {
 class _IndexPageState extends State<IndexPage> {
   final Map<(IconData, String), WidgetBuilder> _pages = {
     (Icons.list_alt_outlined, 'Post'): (context) => const PostListPage(),
-    (Icons.cloud_download_outlined, 'Downloader'): (context) => const DownloaderPage(),
-    (Icons.settings,'Settings'): (context) => const Placeholder(),
+    (Icons.cloud_download_outlined, 'Downloader'): (context) =>
+        const DownloaderPage(),
+    (Icons.settings, 'Settings'): (context) => const SettingsPage(),
   };
 
   final controller = PageController();
@@ -23,7 +25,8 @@ class _IndexPageState extends State<IndexPage> {
 
   @override
   Widget build(BuildContext context) {
-    final isVertical = MediaQuery.of(context).size.width < MediaQuery.of(context).size.height;
+    final isVertical =
+        MediaQuery.of(context).size.width < MediaQuery.of(context).size.height;
 
     return Scaffold(
       body: Row(
@@ -57,21 +60,21 @@ class _IndexPageState extends State<IndexPage> {
       ),
       bottomNavigationBar: switch (isVertical) {
         true => BottomNavigationBar(
-          onTap: (index) {
-            setState(() {
-              _selectedIndex = index;
-            });
-          },
-          currentIndex: _selectedIndex,
-          type: BottomNavigationBarType.fixed,
-          items: [
-            for (final key in _pages.keys)
-              BottomNavigationBarItem(
-                icon: Icon(key.$1),
-                label: key.$2,
-              ),
-          ],
-        ),
+            onTap: (index) {
+              setState(() {
+                _selectedIndex = index;
+              });
+            },
+            currentIndex: _selectedIndex,
+            type: BottomNavigationBarType.fixed,
+            items: [
+              for (final key in _pages.keys)
+                BottomNavigationBarItem(
+                  icon: Icon(key.$1),
+                  label: key.$2,
+                ),
+            ],
+          ),
         false => null,
       },
     );

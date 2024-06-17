@@ -1,5 +1,4 @@
 import 'package:flutter_easyloading/flutter_easyloading.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:yande_gui/image_saver.dart';
 import 'package:yande_gui/rust_lib.dart';
@@ -68,7 +67,8 @@ class Downloader extends _$Downloader {
       EasyLoading.showToast('Download task already exists');
       return null;
     }
-    if (await ImageSaver.existImage('${post.id}.${post.fileExt}',post.fileSize)) {
+    if (await ImageSaver.existImage(
+        '${post.id}.${post.fileExt}', post.fileSize)) {
       EasyLoading.showToast('Image file already exists');
       return null;
     }
@@ -89,7 +89,7 @@ class DownloadTask extends _$DownloadTask {
     );
   }
 
-  void updateProgress(int received, int total) {
+  void updateProgress(BigInt received, BigInt total) {
     state = state.copyWith(progress: received / total);
   }
 

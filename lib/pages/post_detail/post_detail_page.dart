@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:url_launcher/url_launcher_string.dart';
 import 'package:yande_gui/components/yande_image/yande_image.dart';
 import 'package:yande_gui/pages/downloader/logic.dart';
 import 'package:yande_gui/pages/post_detail/post_similar_widget.dart';
@@ -26,6 +27,12 @@ class _PostDetailPageState extends ConsumerState<PostDetailPage> {
     super.dispose();
   }
 
+  static String formatIntDateTime(int timestamp) {
+    final dateTime = DateTime.fromMillisecondsSinceEpoch(timestamp * 1000, isUtc: true).toLocal();
+
+    return '${dateTime.year}-${dateTime.month.toString().padLeft(2, '0')}-${dateTime.day.toString().padLeft(2, '0')} ${dateTime.hour.toString().padLeft(2, '0')}:${dateTime.minute.toString().padLeft(2, '0')}';
+  }
+
   @override
   Widget build(BuildContext context) {
     return AutoScaffold(
@@ -38,31 +45,88 @@ class _PostDetailPageState extends ConsumerState<PostDetailPage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text('id: ${post.id}'),
+                  Text('date: ${formatIntDateTime(post.createdAt)}'),
                   Text('author: ${post.author}'),
+                  if (RegExp(
+                    r'^(?:http|https)://[\w\-]+(?:\.[\w\-]+)*(?::\d+)?(?:/\S*)?$',
+                    caseSensitive: false,
+                    multiLine: false,
+                  ).hasMatch(post.source))
+                    GestureDetector(
+                      behavior: HitTestBehavior.opaque,
+                      onTap: () {
+                        if (post.source.startsWith('https://i.pximg.net/')) {
+                          // try to get id from source because direct link is 403 Forbidden
+                          final list1 = post.source.split('/');
+                          final idPart = list1.last;
+
+                          final list2 = idPart.split('_');
+
+                          final id = list2.first;
+
+                          launchUrlString('https://www.pixiv.net/artworks/$id');
+                          return;
+                        }
+
+                        launchUrlString(post.source);
+                      },
+                      onLongPress: () {
+                        //set clipboard
+                        Clipboard.setData(ClipboardData(text: post.source));
+                        EasyLoading.showSuccess('Copied ${post.source}');
+                      },
+                      child: RichText(
+                        text: TextSpan(
+                          text: 'source: ',
+                          style: DefaultTextStyle.of(context).style,
+                          children: <TextSpan>[
+                            TextSpan(
+                              text: post.source,
+                              style: const TextStyle(
+                                color: Colors.blue,
+                                // decoration: TextDecoration.underline,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    )
+                  else
+                    GestureDetector(
+                      behavior: HitTestBehavior.opaque,
+                      onTap: () {
+                        //set clipboard
+                        Clipboard.setData(ClipboardData(text: post.source));
+                        EasyLoading.showSuccess('Copied ${post.source}');
+                      },
+                      child: Text('source: ${post.source}', overflow: TextOverflow.ellipsis),
+                    ),
                   Text('width: ${post.width}'),
                   Text('height: ${post.height}'),
                   Text('score: ${post.score}'),
                   Text('size: ${(post.fileSize / 1024 / 1024).toStringAsFixed(2)}MB'),
                   Text('parent: ${post.parentId}'),
                   Text('hasChildren: ${post.hasChildren}'),
-                  Wrap(
-                    children: [
-                      for (final tag in post.tags.split(' '))
-                        GestureDetector(
-                          onTap: () {
-                            //set clipboard
-                            Clipboard.setData(ClipboardData(text: tag));
-                            EasyLoading.showSuccess('Copied $tag');
-                          },
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 4),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 4),
+                    child: Wrap(
+                      runSpacing: 6,
+                      spacing: 6,
+                      children: [
+                        for (final tag in post.tags.split(' '))
+                          GestureDetector(
+                            onTap: () {
+                              //set clipboard
+                              Clipboard.setData(ClipboardData(text: tag));
+                              EasyLoading.showSuccess('Copied $tag');
+                            },
                             child: Chip(
                               labelPadding: const EdgeInsets.symmetric(horizontal: 4),
                               label: Text(tag),
                             ),
-                          ),
-                        )
-                    ],
+                          )
+                      ],
+                    ),
                   )
                 ],
               ),
@@ -95,6 +159,7 @@ class _PostDetailPageState extends ConsumerState<PostDetailPage> {
               }),
             ),
             if (post.parentId != null || post.hasChildren) SliverToBoxAdapter(child: PostSimilarWidget(id: post.id)),
+
           ],
         );
       },

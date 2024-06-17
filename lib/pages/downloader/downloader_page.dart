@@ -18,7 +18,8 @@ class DownloaderPage extends ConsumerWidget {
         return ListView.builder(
           itemCount: state.tasks.length,
           //reverse
-          itemBuilder: (context, index) => DownloadTaskWidget(provider: state.tasks[state.tasks.length - index - 1]),
+          itemBuilder: (context, index) => DownloadTaskWidget(
+              provider: state.tasks[state.tasks.length - index - 1]),
         );
       },
     );

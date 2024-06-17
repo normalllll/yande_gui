@@ -27,7 +27,7 @@ class YandeClient {
   static Future<void> downloadToFile({
     required String url,
     required String filePath,
-    required Future<void> Function(int, int) progressCallback,
+    required Future<void> Function(BigInt, BigInt) progressCallback,
   }) async {
     return rust.downloadToFile(
       url: url,
@@ -38,7 +38,7 @@ class YandeClient {
 
   static Future<Uint8List> downloadToMemory({
     required String url,
-    required Future<void> Function(int, int) progressCallback,
+    required Future<void> Function(BigInt, BigInt) progressCallback,
   }) async {
     return rust.downloadToMemory(
       url: url,

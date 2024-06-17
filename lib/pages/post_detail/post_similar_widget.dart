@@ -1,12 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yande_gui/components/yande_image/yande_image.dart';
-import 'package:yande_gui/image_saver.dart';
 import 'package:yande_gui/pages/downloader/logic.dart';
 import 'package:yande_gui/pages/post_detail/logic.dart';
-import 'package:yande_gui/rust_lib.dart';
 import 'package:yande_gui/src/rust/yande/model/post.dart';
 
 class PostSimilarWidget extends ConsumerStatefulWidget {
@@ -70,8 +67,11 @@ class _PostSimilarWidgetState extends ConsumerState<PostSimilarWidget> {
           behavior: HitTestBehavior.opaque,
           child: Text('Error: $error'),
         ),
-      _ => const Center(
-          child: CupertinoActivityIndicator(),
+      _ => const Padding(
+          padding: EdgeInsets.symmetric(horizontal: 4),
+          child: Center(
+            child: CupertinoActivityIndicator(),
+          ),
         ),
     };
   }

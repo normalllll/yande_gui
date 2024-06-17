@@ -6,8 +6,6 @@ import 'package:yande_gui/rust_lib.dart';
 
 import 'pages/index/index_page.dart';
 
-
-
 Future<void> main() async {
   await rustInit();
   runApp(const ProviderScope(child: MyApp()));

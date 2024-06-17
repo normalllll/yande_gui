@@ -16,7 +16,7 @@ impl YandeClient {
 }
 
 impl YandeClient {
-    pub async fn get_posts(&self, tags: Vec<String>, limit: usize, page: usize) -> anyhow::Result<Vec<Post>> {
+    pub async fn get_posts(&self, tags: Vec<String>, limit: u32, page: u32) -> anyhow::Result<Vec<Post>> {
         let tags = tags.iter().map(|tag| ("tags", tag.as_str())).collect::<Vec<_>>();
         let resp = self.http.get("https://yande.re/post.json", Some(
             tags.iter().chain(vec![
@@ -28,7 +28,7 @@ impl YandeClient {
         Ok(posts)
     }
 
-    pub async fn get_similar(&self, post_id: u64) -> anyhow::Result<Similar> {
+    pub async fn get_similar(&self, post_id: i64) -> anyhow::Result<Similar> {
         let resp = self.http.get("https://yande.re/post/similar.json", Some(
             vec![("id", post_id.to_string().as_str())]
         )).await?;

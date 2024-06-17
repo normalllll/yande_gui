@@ -2,11 +2,12 @@ import 'dart:io';
 
 import 'package:flutter/services.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as path;
+import 'package:path_provider/path_provider.dart';
 
 class ImageSaver {
-  static const MethodChannel _channel = MethodChannel('io.github.normalllll.yande_gui/imagesaver');
+  static const MethodChannel _channel =
+      MethodChannel('io.github.normalllll.yande_gui/imagesaver');
 
   static Future<bool> saveImage(Uint8List imageBytes, String filename) async {
     if (Platform.isAndroid) {

@@ -1,6 +1,5 @@
 import 'package:extended_image/extended_image.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import 'image_provider.dart';
@@ -42,7 +41,7 @@ class YandeImage extends StatelessWidget {
       image: YandeExtendedImageProvider(
         url,
         cache: true,
-        printError: kDebugMode,
+        printError: false,
       ),
       handleLoadingProgress: true,
       initGestureConfigHandler: switch (gesture) {
@@ -76,13 +75,9 @@ class YandeImage extends StatelessWidget {
                     ],
                   );
                 } else {
-                  return Padding(
-                    padding: const EdgeInsets.all(5),
-                    child: Center(
-                      child: CircularProgressIndicator(
-                        value: progress,
-                      ),
-                    ),
+                  return const Padding(
+                    padding: EdgeInsets.all(5),
+                    child: Center(child: CupertinoActivityIndicator()),
                   );
                 }
               }
@@ -95,9 +90,16 @@ class YandeImage extends StatelessWidget {
                   ],
                 );
               } else {
-                return const Padding(padding: EdgeInsets.all(5), child: Center(child: CupertinoActivityIndicator()));
+                return const Padding(
+                  padding: EdgeInsets.all(5),
+                  child: Center(child: CupertinoActivityIndicator()),
+                );
               }
             }
+            return const Padding(
+              padding: EdgeInsets.all(5),
+              child: Center(child: CupertinoActivityIndicator()),
+            );
           case LoadState.completed:
             return imageBuilder?.call(state.completedWidget);
           case LoadState.failed:

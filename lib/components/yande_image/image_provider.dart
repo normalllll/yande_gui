@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 import 'dart:ui' as ui show Codec;
+
 import 'package:extended_image/extended_image.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
@@ -8,7 +9,8 @@ import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:yande_gui/rust_lib.dart';
 
-class YandeExtendedImageProvider extends ImageProvider<ExtendedNetworkImageProvider>
+class YandeExtendedImageProvider
+    extends ImageProvider<ExtendedNetworkImageProvider>
     with ExtendedImageProvider<ExtendedNetworkImageProvider>
     implements ExtendedNetworkImageProvider {
   /// Creates an object that fetches the image at the given URL.
@@ -94,7 +96,8 @@ class YandeExtendedImageProvider extends ImageProvider<ExtendedNetworkImageProvi
     // Ownership of this controller is handed off to [_loadAsync]; it is that
     // method's responsibility to close the controller's stream when the image
     // has been loaded or an error is thrown.
-    final StreamController<ImageChunkEvent> chunkEvents = StreamController<ImageChunkEvent>();
+    final StreamController<ImageChunkEvent> chunkEvents =
+        StreamController<ImageChunkEvent>();
 
     return MultiFrameImageStreamCompleter(
       codec: _loadAsync(
@@ -115,7 +118,8 @@ class YandeExtendedImageProvider extends ImageProvider<ExtendedNetworkImageProvi
   }
 
   @override
-  Future<ExtendedNetworkImageProvider> obtainKey(ImageConfiguration configuration) {
+  Future<ExtendedNetworkImageProvider> obtainKey(
+      ImageConfiguration configuration) {
     return SynchronousFuture<ExtendedNetworkImageProvider>(this);
   }
 
@@ -175,7 +179,8 @@ class YandeExtendedImageProvider extends ImageProvider<ExtendedNetworkImageProvi
     StreamController<ImageChunkEvent>? chunkEvents,
     String md5Key,
   ) async {
-    final Directory _cacheImagesDirectory = Directory(join((await getTemporaryDirectory()).path, cacheImageFolderName));
+    final Directory _cacheImagesDirectory = Directory(
+        join((await getTemporaryDirectory()).path, cacheImageFolderName));
     Uint8List? data;
     // exist, try to find cache image file
     if (_cacheImagesDirectory.existsSync()) {
@@ -243,22 +248,22 @@ class YandeExtendedImageProvider extends ImageProvider<ExtendedNetworkImageProvi
       //       : null,
       // );
 
-
       final Uint8List bytes = await YandeClient.downloadToMemory(
         url: url,
-        progressCallback: (int received, int total) async {
+        progressCallback: (BigInt received, BigInt total) async {
           // print('received: $received, total: $total');
           chunkEvents?.add(
             ImageChunkEvent(
-              cumulativeBytesLoaded: received,
-              expectedTotalBytes: total,
+              cumulativeBytesLoaded: received.toInt(),
+              expectedTotalBytes: total.toInt(),
             ),
           );
         },
       );
 
       if (bytes.lengthInBytes == 0) {
-        return Future<Uint8List>.error(StateError('NetworkImage is an empty file: $resolved'));
+        return Future<Uint8List>.error(
+            StateError('NetworkImage is an empty file: $resolved'));
       }
 
       return bytes;
