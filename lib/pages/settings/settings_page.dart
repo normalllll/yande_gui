@@ -1,5 +1,8 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher_string.dart';
+import 'package:yande_gui/src/rust/api/rustc.dart';
 import 'package:yande_gui/widgets/auto_scaffold/auto_scaffold.dart';
 
 class SettingsPage extends StatefulWidget {
@@ -10,7 +13,7 @@ class SettingsPage extends StatefulWidget {
 }
 
 class _SettingsPageState extends State<SettingsPage> {
-  Widget buildItem({required String title,  String? subtitle, Function()? onTap}) {
+  Widget buildItem({required String title, String? subtitle, Function()? onTap}) {
     return Card(
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(10),
@@ -39,6 +42,14 @@ class _SettingsPageState extends State<SettingsPage> {
               onTap: () {
                 launchUrlString('https://github.com/normalllll/yande_gui');
               },
+            ),
+            buildItem(
+              title: 'Flutter Version',
+              subtitle: Platform.version,
+            ),
+            buildItem(
+              title: 'Rust Version',
+              subtitle: rustcVersion(),
             ),
             buildItem(
               title: '@TODO',

@@ -6,6 +6,7 @@
 // Static analysis wrongly picks the IO variant, thus ignore this
 // ignore_for_file: argument_type_not_assignable
 
+import 'api/rustc.dart';
 import 'api/yande_client.dart';
 import 'dart:async';
 import 'dart:convert';
