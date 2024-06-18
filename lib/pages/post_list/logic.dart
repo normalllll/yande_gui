@@ -47,10 +47,10 @@ class PostListSource extends DataListSource<Post> {
 @riverpod
 class PostList extends _$PostList {
   @override
-  PostListState build() {
+  PostListState build(Type type, {required List<String> tags}) {
     return PostListState(
-      tags: [],
-      source: PostListSource(),
+      tags: tags,
+      source: PostListSource(tags: tags),
     );
   }
 

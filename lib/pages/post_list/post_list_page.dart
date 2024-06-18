@@ -10,7 +10,9 @@ import 'package:yande_gui/widgets/auto_scaffold/auto_scaffold.dart';
 import 'logic.dart';
 
 class PostListPage extends ConsumerStatefulWidget {
-  const PostListPage({super.key});
+  final List<String>? tags;
+
+  const PostListPage({super.key, this.tags});
 
   @override
   ConsumerState createState() => _PostListPageState();
@@ -18,12 +20,12 @@ class PostListPage extends ConsumerStatefulWidget {
 
 class _PostListPageState extends ConsumerState<PostListPage> {
   final scrollController = ScrollController();
-  final searchInputController = TextEditingController();
+  late final searchInputController = TextEditingController(text: widget.tags?.join(' '));
   final focusNode = FocusNode();
 
   @override
   Widget build(BuildContext context) {
-    final provider = postListProvider;
+    final provider = postListProvider(runtimeType, tags: widget.tags ?? []);
 
     final state = ref.watch(provider);
     double screenWidth = MediaQuery.of(context).size.width;
@@ -32,92 +34,103 @@ class _PostListPageState extends ConsumerState<PostListPage> {
 
     int autoRowMax = screenWidth ~/ targetWidth;
 
+    Widget buildRowCountSelector() {
+      return Padding(
+        padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 2),
+        child: DropdownButton<int>(
+          value: state.rowMax,
+          items: [
+            DropdownMenuItem(value: 0, child: Text('Auto: $autoRowMax')),
+            const DropdownMenuItem(value: 2, child: Text('Row: 2')),
+            const DropdownMenuItem(value: 3, child: Text('Row: 3')),
+            const DropdownMenuItem(value: 4, child: Text('Row: 4')),
+            const DropdownMenuItem(value: 5, child: Text('Row: 5')),
+          ],
+          onChanged: (value) {
+            ref.read(provider.notifier).onRowMaxChanged(value ?? 0);
+          },
+        ),
+      );
+    }
+
+    Widget buildSearchBar() {
+      return Padding(
+        padding: const EdgeInsets.symmetric(vertical: 5),
+        child: Row(
+          children: [
+            Expanded(
+              child: TextField(
+                controller: searchInputController,
+                focusNode: focusNode,
+                decoration: const InputDecoration(
+                  hintText: 'Tags',
+                ),
+                onSubmitted: (value) {
+                  ref.read(provider.notifier).onTagsChanged(value.trim().split(' '));
+                },
+              ),
+            ),
+            buildRowCountSelector(),
+            IconButton(
+              onPressed: () {
+                searchInputController.clear();
+                if (!focusNode.hasFocus) {
+                  ref.read(provider.notifier).onTagsChanged([]);
+                }
+              },
+              icon: const Icon(Icons.clear),
+            ),
+          ],
+        ),
+      );
+    }
+
     return AutoScaffold(
-      verticalOnlyTitleWidget: const Text('Post List'),
+      verticalOnlyTitleWidget: widget.tags == null ? const Text('Post List') : null,
+      titleWidget: switch (widget.tags) {
+        null => null,
+        final tags => Row(
+            children: [
+              Text('Post List: ${tags.join(' ')}'),
+              const Spacer(),
+              buildRowCountSelector(),
+            ],
+          ),
+      },
       builder: (context, horizontal) {
         return Column(
           children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 5),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: TextField(
-                      controller: searchInputController,
-                      focusNode: focusNode,
-                      decoration: const InputDecoration(
-                        hintText: 'Tags',
-                      ),
-                      onSubmitted: (value) {
-                        print(value);
-                        ref
-                            .read(provider.notifier)
-                            .onTagsChanged(value.trim().split(' '));
-                      },
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 4),
-                    child: DropdownButton<int>(
-                      value: state.rowMax,
-                      items: [
-                        DropdownMenuItem(
-                            value: 0, child: Text('Auto: $autoRowMax')),
-                        const DropdownMenuItem(value: 2, child: Text('Row: 2')),
-                        const DropdownMenuItem(value: 3, child: Text('Row: 3')),
-                        const DropdownMenuItem(value: 4, child: Text('Row: 4')),
-                        const DropdownMenuItem(value: 5, child: Text('Row: 5')),
-                      ],
-                      onChanged: (value) {
-                        ref.read(provider.notifier).onRowMaxChanged(value ?? 0);
-                      },
-                    ),
-                  ),
-                  IconButton(
-                    onPressed: () {
-                      searchInputController.clear();
-                      if (!focusNode.hasFocus) {
-                        ref.read(provider.notifier).onTagsChanged([]);
-                      }
-                    },
-                    icon: const Icon(Icons.clear),
-                  ),
-                ],
-              ),
-            ),
+            if (widget.tags == null) buildSearchBar(),
             Expanded(
               child: RefreshIndicator(
                 onRefresh: () => state.source.refresh(true),
                 child: LoadingMoreList(
                   ListConfig(
-                    extendedListDelegate:
-                        SliverWaterfallFlowDelegateWithFixedCrossAxisCount(
-                            crossAxisCount:
-                                state.rowMax == 0 ? autoRowMax : state.rowMax),
+                    extendedListDelegate: SliverWaterfallFlowDelegateWithFixedCrossAxisCount(crossAxisCount: state.rowMax == 0 ? autoRowMax : state.rowMax),
                     controller: scrollController,
                     itemBuilder: (BuildContext context, item, int index) {
                       return GestureDetector(
                         onTap: () {
-                          Navigator.of(context).push(MaterialPageRoute(
-                              builder: (context) =>
-                                  PostDetailPage(post: item)));
+                          Navigator.of(context).push(MaterialPageRoute(builder: (context) => PostDetailPage(post: item)));
                         },
                         child: LayoutBuilder(
                           builder: (context, constraints) {
                             const padding = 4;
                             final width = constraints.maxWidth - padding * 2;
-                            final height = (item.height * width / item.width) -
-                                padding * 2;
+                            final height = (item.height * width / item.width) - padding * 2;
                             return Padding(
                               padding: const EdgeInsets.all(4),
                               child: Stack(
                                 children: [
                                   ClipRRect(
                                     borderRadius: BorderRadius.circular(6),
-                                    child: YandeImage(
-                                      item.previewUrl,
-                                      width: width,
-                                      height: height,
+                                    child: Hero(
+                                      tag: item.id,
+                                      child: YandeImage(
+                                        item.previewUrl,
+                                        width: width,
+                                        height: height,
+                                      ),
                                     ),
                                   ),
                                   if (item.parentId != null)
@@ -129,8 +142,7 @@ class _PostListPageState extends ConsumerState<PostListPage> {
                                         decoration: BoxDecoration(
                                           color: Colors.black.withOpacity(0.5),
                                         ),
-                                        child: const Icon(Icons.more_outlined,
-                                            color: Colors.white),
+                                        child: const Icon(Icons.more_outlined, color: Colors.white),
                                       ),
                                     )
                                   else if (item.hasChildren)
@@ -142,8 +154,7 @@ class _PostListPageState extends ConsumerState<PostListPage> {
                                         decoration: BoxDecoration(
                                           color: Colors.black.withOpacity(0.5),
                                         ),
-                                        child: const Icon(Icons.more_horiz,
-                                            color: Colors.white),
+                                        child: const Icon(Icons.more_horiz, color: Colors.white),
                                       ),
                                     ),
                                   Positioned(
@@ -156,8 +167,7 @@ class _PostListPageState extends ConsumerState<PostListPage> {
                                       ),
                                       child: Text(
                                         '${Resolution.match(item.width * item.height).title} ${item.width} x ${item.height}',
-                                        style: const TextStyle(
-                                            color: Colors.white),
+                                        style: const TextStyle(color: Colors.white),
                                       ),
                                     ),
                                   ),
@@ -188,8 +198,7 @@ class _PostListPageState extends ConsumerState<PostListPage> {
           scrollController.jumpTo(0);
         },
         mini: true,
-        child:
-            const Icon(Icons.vertical_align_top_outlined, color: Colors.white),
+        child: const Icon(Icons.vertical_align_top_outlined, color: Colors.white),
       ),
     );
   }

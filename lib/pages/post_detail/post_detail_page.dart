@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
@@ -7,6 +9,7 @@ import 'package:url_launcher/url_launcher_string.dart';
 import 'package:yande_gui/components/yande_image/yande_image.dart';
 import 'package:yande_gui/pages/downloader/logic.dart';
 import 'package:yande_gui/pages/post_detail/post_similar_widget.dart';
+import 'package:yande_gui/pages/post_list/post_list_page.dart';
 import 'package:yande_gui/src/rust/yande/model/post.dart';
 import 'package:yande_gui/widgets/auto_scaffold/auto_scaffold.dart';
 
@@ -60,11 +63,19 @@ class _PostDetailPageState extends ConsumerState<PostDetailPage> {
     }
 
     if (schemeUrl case String schemeUrl?) {
-      if (!await launchUrlString(schemeUrl)) {
-        launchUrlString(url);
+      if (Platform.isAndroid) {
+        if (!await launchUrlString(schemeUrl, mode: LaunchMode.externalApplication)) {
+          launchUrlString(url, mode: LaunchMode.externalApplication);
+        }
+      } else {
+        if (await canLaunchUrlString(schemeUrl)) {
+          launchUrlString(schemeUrl, mode: LaunchMode.externalApplication);
+        } else {
+          launchUrlString(url, mode: LaunchMode.externalApplication);
+        }
       }
     } else {
-      launchUrlString(url);
+      launchUrlString(url, mode: LaunchMode.externalApplication);
     }
   }
 
@@ -135,12 +146,19 @@ class _PostDetailPageState extends ConsumerState<PostDetailPage> {
                       children: [
                         for (final tag in post.tags.split(' '))
                           GestureDetector(
+                            behavior: HitTestBehavior.opaque,
                             onTap: () {
+                              Navigator.of(context).push(MaterialPageRoute(builder: (context) => PostListPage(tags: [tag])));
+                            },
+                            onLongPress: () {
                               //set clipboard
                               Clipboard.setData(ClipboardData(text: tag));
                               EasyLoading.showSuccess('Copied $tag');
                             },
                             child: Chip(
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(4),
+                              ),
                               labelPadding: const EdgeInsets.symmetric(horizontal: 4),
                               label: Text(tag),
                             ),
@@ -164,15 +182,18 @@ class _PostDetailPageState extends ConsumerState<PostDetailPage> {
                       }
                     });
                   },
-                  child: YandeImage(
-                    post.sampleUrl,
-                    width: width,
-                    height: height,
-                    gesture: true,
-                    placeholderWidget: YandeImage(
-                      post.previewUrl,
+                  child: Hero(
+                    tag: post.id,
+                    child: YandeImage(
+                      post.sampleUrl,
                       width: width,
                       height: height,
+                      gesture: true,
+                      placeholderWidget: YandeImage(
+                        post.previewUrl,
+                        width: width,
+                        height: height,
+                      ),
                     ),
                   ),
                 );
