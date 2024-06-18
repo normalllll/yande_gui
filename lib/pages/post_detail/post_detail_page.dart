@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 import 'package:yande_gui/components/yande_image/yande_image.dart';
 import 'package:yande_gui/pages/downloader/logic.dart';
@@ -33,6 +34,40 @@ class _PostDetailPageState extends ConsumerState<PostDetailPage> {
     return '${dateTime.year}-${dateTime.month.toString().padLeft(2, '0')}-${dateTime.day.toString().padLeft(2, '0')} ${dateTime.hour.toString().padLeft(2, '0')}:${dateTime.minute.toString().padLeft(2, '0')}';
   }
 
+  Future<void> openUrl(String url) async {
+    if (post.source.startsWith('https://i.pximg.net/')) {
+      // try to get id from source because direct link is 403 Forbidden
+      final list1 = post.source.split('/');
+      final idPart = list1.last;
+
+      final list2 = idPart.split('_');
+
+      final id = list2.first;
+
+      url = 'https://www.pixiv.net/artworks/$id';
+    }
+
+    final String? schemeUrl;
+
+    if (url.contains('https://www.pixiv.net/artworks') || url.contains('https://pixiv.net/artworks')) {
+      final id = url.split('/').last;
+      schemeUrl = 'pixiv://illusts/$id';
+    } else if (url.contains('https://www.pixiv.net/users') || url.contains('https://pixiv.net/users')) {
+      final id = url.split('/').last;
+      schemeUrl = 'pixiv://users/$id';
+    } else {
+      schemeUrl = null;
+    }
+
+    if (schemeUrl case String schemeUrl?) {
+      if (!await launchUrlString(schemeUrl)) {
+        launchUrlString(url);
+      }
+    } else {
+      launchUrlString(url);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return AutoScaffold(
@@ -54,22 +89,7 @@ class _PostDetailPageState extends ConsumerState<PostDetailPage> {
                   ).hasMatch(post.source))
                     GestureDetector(
                       behavior: HitTestBehavior.opaque,
-                      onTap: () {
-                        if (post.source.startsWith('https://i.pximg.net/')) {
-                          // try to get id from source because direct link is 403 Forbidden
-                          final list1 = post.source.split('/');
-                          final idPart = list1.last;
-
-                          final list2 = idPart.split('_');
-
-                          final id = list2.first;
-
-                          launchUrlString('https://www.pixiv.net/artworks/$id');
-                          return;
-                        }
-
-                        launchUrlString(post.source);
-                      },
+                      onTap: () => openUrl(post.source),
                       onLongPress: () {
                         //set clipboard
                         Clipboard.setData(ClipboardData(text: post.source));
@@ -159,7 +179,6 @@ class _PostDetailPageState extends ConsumerState<PostDetailPage> {
               }),
             ),
             if (post.parentId != null || post.hasChildren) SliverToBoxAdapter(child: PostSimilarWidget(id: post.id)),
-
           ],
         );
       },
