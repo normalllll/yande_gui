@@ -105,7 +105,6 @@ class YandeImage extends StatelessWidget {
           case LoadState.failed:
             return Center(child: IconButton(icon: const Icon(Icons.refresh_outlined), onPressed: state.reLoadImage));
         }
-        return null;
       },
       color: color,
       colorBlendMode: colorBlendMode,
