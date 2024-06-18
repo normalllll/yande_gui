@@ -5,14 +5,14 @@ import 'package:url_launcher/url_launcher_string.dart';
 import 'package:yande_gui/src/rust/api/rustc.dart';
 import 'package:yande_gui/widgets/auto_scaffold/auto_scaffold.dart';
 
-class SettingsPage extends StatefulWidget {
-  const SettingsPage({super.key});
+class AboutPage extends StatefulWidget {
+  const AboutPage({super.key});
 
   @override
-  State<SettingsPage> createState() => _SettingsPageState();
+  State<AboutPage> createState() => _AboutPageState();
 }
 
-class _SettingsPageState extends State<SettingsPage> {
+class _AboutPageState extends State<AboutPage> {
   Widget buildItem({required String title, String? subtitle, Function()? onTap}) {
     return Card(
       shape: RoundedRectangleBorder(
@@ -32,7 +32,7 @@ class _SettingsPageState extends State<SettingsPage> {
   @override
   Widget build(BuildContext context) {
     return AutoScaffold(
-      verticalOnlyTitleWidget: const Text('Settings'),
+      verticalOnlyTitleWidget: const Text('About'),
       builder: (context, horizontal) {
         return ListView(
           children: [
@@ -40,7 +40,14 @@ class _SettingsPageState extends State<SettingsPage> {
               title: 'Project URL',
               subtitle: 'https://github.com/normalllll/yande_gui',
               onTap: () {
-                launchUrlString('https://github.com/normalllll/yande_gui');
+                launchUrlString('https://github.com/normalllll/yande_gui', mode: LaunchMode.externalApplication);
+              },
+            ),
+            buildItem(
+              title: 'Publish page',
+              subtitle: 'https://github.com/normalllll/yande_gui/releases/latest',
+              onTap: () {
+                launchUrlString('https://github.com/normalllll/yande_gui/releases/latest', mode: LaunchMode.externalApplication);
               },
             ),
             buildItem(
@@ -50,9 +57,6 @@ class _SettingsPageState extends State<SettingsPage> {
             buildItem(
               title: 'Rust Version',
               subtitle: rustcVersion(),
-            ),
-            buildItem(
-              title: '@TODO',
             ),
           ],
         );
