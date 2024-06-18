@@ -112,10 +112,13 @@ class _PostListPageState extends ConsumerState<PostListPage> {
                               padding: const EdgeInsets.all(4),
                               child: Stack(
                                 children: [
-                                  YandeImage(
-                                    item.previewUrl,
-                                    width: width,
-                                    height: height,
+                                  ClipRRect(
+                                    borderRadius: BorderRadius.circular(6),
+                                    child: YandeImage(
+                                      item.previewUrl,
+                                      width: width,
+                                      height: height,
+                                    ),
                                   ),
                                   if (item.parentId != null)
                                     Positioned(
