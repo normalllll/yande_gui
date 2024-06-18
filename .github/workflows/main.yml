@@ -116,7 +116,6 @@ jobs:
         run: flutter build windows
       - name: Package Windows Build
         run: |
-#          7z a -tzip windows-x64.zip build\windows\x64\runner\Release\* -r
           cd build\windows\x64\runner\Release\ && 7z a -tzip windows-x64.zip .\*
 
       - name: Create GitHub Release
@@ -177,7 +176,6 @@ jobs:
       - name: Package Linux Tarball
         run: |
           cd build/linux/x64/release/bundle && tar -czvf linux-x64.tar.gz *
-#          tar -czvf linux-x64.tar.gz -C build/linux/x64/release/bundle .
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
