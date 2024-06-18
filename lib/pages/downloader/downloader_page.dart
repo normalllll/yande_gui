@@ -13,13 +13,14 @@ class DownloaderPage extends ConsumerWidget {
     final provider = downloaderProvider;
     final state = ref.watch(provider);
     return AutoScaffold(
-      titleWidget: const Text('Downloader'),
+      verticalOnlyTitleWidget: const Text('Downloader'),
       builder: (context, horizontal) {
         return ListView.builder(
           itemCount: state.tasks.length,
           //reverse
           itemBuilder: (context, index) => DownloadTaskWidget(
-              provider: state.tasks[state.tasks.length - index - 1]),
+            provider: state.tasks[state.tasks.length - index - 1],
+          ),
         );
       },
     );
