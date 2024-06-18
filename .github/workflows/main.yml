@@ -116,13 +116,14 @@ jobs:
         run: flutter build windows
       - name: Package Windows Build
         run: |
-          cd build\windows\x64\runner\Release\ && 7z a -tzip windows-x64.zip .\*
+          cd build\windows\x64\runner\Release && 7z a -tzip windows-x64.zip .\*
+
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
           files: |
-            windows-x64.zip
+            build\windows\x64\runner\Release\windows-x64.zip
           token: ${{ secrets.PUBLISH_GITHUB_TOKEN }}
 
   build-and-release-linux-x64:
@@ -177,11 +178,12 @@ jobs:
         run: |
           cd build/linux/x64/release/bundle && tar -czvf linux-x64.tar.gz *
 
+
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
           files: |
-            linux-x64.tar.gz
+            build/linux/x64/release/bundle/linux-x64.tar.gz
           token: ${{ secrets.PUBLISH_GITHUB_TOKEN }}
 
   build-and-release-ios:
